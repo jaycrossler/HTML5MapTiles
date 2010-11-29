@@ -1,0 +1,13 @@
+CACHE MANIFEST
+ 
+# Offline cache 2010-10-22-v1
+
+CACHE:
+canvas.html
+message.js
+tilemap.js
+painter.js
+game.js
+mapmodel.js
+
+images/*

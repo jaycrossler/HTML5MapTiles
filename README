@@ -1,0 +1,6 @@
+/*All code copyright 2010 by John Graham unless otherwise attributed*/
+//Edits and additions by Jay Crossler, changes Creative Commons BY/3.0 license
+
+An HTML5 JavaScript library originally written by John Graham and updated by Jay Crossler
+
+Pulls a JSON object of a map set of tiles and sprites, then maps them onto a Canvas graphical object

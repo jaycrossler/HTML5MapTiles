@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US"> 
+<head> 
+	<title>MapTiles</title> 
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+	<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" /> 
+	<meta name="description" content="HTML5 Canvas MapTiles by SMORG and Jay Crossler" /> 
+	<meta name="keywords" content="html5, canvas, maptiles, sprites, spritesheets" /> 
+	<meta name="robots" content="index, follow" /> 
+    <link rel="apple-touch-icon" href="images/map57.png"/>
+
+	<style type="text/css">
+	<!--
+	html,
+	body {
+		margin:0;
+		padding:0;
+		height:100%;
+		overflow:hidden;
+	},
+	#container {
+		height:100%;
+	
+	},
+	#main_canvas {
+		position:relative;
+	    background: #00a;
+	}
+
+	.visibleDiv, #topLeft, #topRight, #bottomLeft, #bottomRight
+	{
+		position: fixed;
+		width: 125px;
+		border: solid 1px #e1e1e1;
+		vertical-align: middle;
+		background: #ffdab9;
+		text-align: center;
+	}
+	
+	#topLeft
+	{
+		top: 10px;
+		left: 10px;
+	}
+	#topRight
+	{
+		top: 10px;
+		right: 10px;
+	}
+	#bottomLeft
+	{
+		bottom: 0px;
+		left: 0px;
+		height: 60px;
+		overflow: hidden;
+	}
+	#bottomRight
+	{
+		bottom: 10px;
+		right: 10px;
+	}
+
+	#main_canvas {
+		position: relative;
+		border: 0px solid #000;
+	}
+
+	//Handles mouse bouncing and other iPad-specific issues
+	* {
+	  -webkit-touch-callout: none;
+	  -webkit-text-size-adjust: none;
+	  -webkit-tap-highlight-color: rgba(0,0,0,0);
+	  -webkit-user-select: none;
+	}
+	</style> 
+
+</head>     
+<body>
+
+    <div id="container">
+		<canvas id="main_canvas">
+			Unfortunately, your browser does not support the canvas tag.
+		</canvas>
+    </div>
+
+    <div id="topLeft">
+        <span id="fps">-</span>
+    </div>
+    <div id="topRight">
+        <span id="message"></span> |
+        <span id="message_single"></span>
+    </div>
+    <div id="bottomLeft">
+		<form id="paint" action="paint">
+		    Paint layer: <select id="painter_layer_num"></select>
+		</form>
+		<canvas id="painter_palette">
+			Drawing pallette
+		</canvas>
+    </div>
+
+	<script type="text/javascript" src="message.js"></script>
+	<script type="text/javascript" src="tilemap.js"></script>
+	<script type="text/javascript" src="painter.js"></script>
+	<script type="text/javascript" src="game.js"></script>
+	<script type="text/javascript" src="mapmodel.js"></script>  
+</body>
+</html>
