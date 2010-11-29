@@ -12,12 +12,14 @@ var Message = { //object to create messages (using alert in a game loop will cra
 		if(Message.message){
 			msg = '- '+msg+'<br />';
 			Message.message.innerHTML += msg;
+			console.log(msg);
 		}
 	},
 	newMessage: function(msg){ //add new message
 		if(Message.message){
 			msg = '- '+msg+'<br />';
 			Message.message.innerHTML = msg;
+			console.log(msg);
 		}
 	},
 	newMessageSingle: function(msg){ //add new message
@@ -38,7 +40,7 @@ var FPS = {
 	},
 	updateFPS: function(){ //add new message
 		if(FPS.fps){
-			FPS.fps.innerHTML = (FPS.fps_count / 2) + 'fps';
+			FPS.fps.innerHTML = (FPS.fps_count / 2) + 'fps (' + Game.fps + ')';
 		}
 		FPS.fps_count = 0;
 	}

@@ -11,6 +11,7 @@ var Painter = {
 	optionPainterSelect: 0,
 	init: function(){
 		drawImageOnCanvas("painter_palette","images/tiles.png");
+		Painter.listSelectableMaps("listofmaps");
 	},
 	addCanvasEvents: function(){
 	  document.body.addEventListener('touchmove',ev_touch_body,false);
@@ -37,7 +38,7 @@ var Painter = {
 
 	  var footer_obj = document.getElementById('bottomLeft');
 	  footer_obj.addEventListener('touchmove', ev_click_footer, false);
-	  footer_obj.addEventListener('click', ev_click_footer, false);
+//	  footer_obj.addEventListener('click', ev_click_footer, false);
 
 	},
 	setLayerOptions: function(){ //add new message
@@ -50,19 +51,32 @@ var Painter = {
 	},
 	sizeCanvasToMax: function(){
 		if (Game && Game.tileEngine) {
-			var canv = Game.tileEngine[0].canvas;
+			var canv = Game.tileEngine[0].canvas; //TODO: Move Canvas out of TileEngine
 			if (canv) {
 				var ctx = canv.getContext("2d");
 				//Set the canvas height based on the 1st layer size
 				canv.setAttribute('width', document.body.clientWidth);
 				canv.setAttribute('height',  document.body.clientHeight);
-				ctx.fillStyle = "rgb(0,0,0)";
-				ctx.fillRect (0,0, canv.clientWidth, canv.clientHeight);
+//				ctx.fillStyle = "rgb(1,1,1)";
+//				ctx.fillRect (0,0, canv.clientWidth, canv.clientHeight);
+				Game.hasChanged = true;
 		
 				//Game.tileEngine[0].canvas.setAttribute('width', (Game.tileEngine[0].tilesWide * Game.tileEngine[0].tileWidth)); //set attributes of canvas
 				//Game.tileEngine[0].canvas.setAttribute('height', (Game.tileEngine[0].tilesHigh * Game.tileEngine[0].tileHeight));
 			}
 		}
+	},
+	listSelectableMaps: function(divContainer){
+		var listHolder = document.getElementById(divContainer);
+		var MapsList = MapModel.listMaps("local");
+		var strItems = '<span onclick="MapModel.saveCurrentMap();">[SAVE]</span><br/>';
+
+		for (var i=0;i<10;i++) {  //TODO: Update beyond temp
+			if (MapsList[i]) 
+				strItems += "<span onclick='MapModel.loadMapById("+i+");'>" + MapsList[i] + "</span> " +
+				"[<span onclick='MapModel.deleteMap("+i+");'>DEL</span>]<br/>";
+		}
+		listHolder.innerHTML = strItems;
 	}
 
 	
@@ -128,18 +142,25 @@ function ev_mousemove (ev) {
   
   if(isMouseDownOnCanvas) {
     MapModel.updateMapTileAtXY(tilepos.x, tilepos.y, Painter.tileToPaint);
+    Game.hasChanged = true;
   }
 };
 function ev_mousedown (ev) {
   isMouseDownOnCanvas = true;
   var coords = getCoords(ev);
   
+  Game.fps = 0.1;
+  Game.startTimer();
   var tiles = MapModel.tileScreenXYBasedOnMouseOverXY(coords.x,coords.y);
   MapModel.updateMapTileAtXY(tiles.x, tiles.y, Painter.tileToPaint);
+  Game.hasChanged = true;
+
 };
 function ev_mouseup (ev) {
-isMouseDownOnCanvas = false;
-  var coords = getCoords(ev);  
+	isMouseDownOnCanvas = false;
+	Game.fps = Game.fpsOld;
+    Game.startTimer();
+
 };
 //-------------------
 
@@ -213,4 +234,3 @@ function getCoords(e) {
 	// Do something with this information
 	return {"x": posx, "y": posy};
 }
-Painter.init();

@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?> 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> 
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US"> 
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US">
+<!-- manifest="cache.manifest"> -->
 <head> 
-	<title>MapTiles</title> 
+	<title>SMORGMap</title> 
     <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
@@ -87,8 +87,8 @@
     </div>
 
     <div id="topLeft">
-        <span id="fps">-</span>
-    </div>
+        <span id="fps">-</span> <span onclick="Cash.test()">[DEL]</span>
+        </div>
     <div id="topRight">
         <span id="message"></span> |
         <span id="message_single"></span>
@@ -101,11 +101,15 @@
 			Drawing pallette
 		</canvas>
     </div>
+    <div id="bottomRight">
+    	<span id="listofmaps"></span>
+	</div>
 
+	<script type="text/javascript" src="cash.js"></script>
 	<script type="text/javascript" src="message.js"></script>
 	<script type="text/javascript" src="tilemap.js"></script>
+	<script type="text/javascript" src="mapmodel.js"></script>
 	<script type="text/javascript" src="painter.js"></script>
 	<script type="text/javascript" src="game.js"></script>
-	<script type="text/javascript" src="mapmodel.js"></script>  
 </body>
 </html>

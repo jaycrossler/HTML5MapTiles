@@ -1,15 +1,86 @@
 /*All code copyright 2010 by Jay Crossler unless otherwise attributed - BY/3.0 License */
 
 var MapModel = { //object to parse JSON and update map model
+	//MapModel.putMapIdDataName(0,MapModel.mapAsJSON(),"Tank Map","local");
+	//MapModel.listMaps("local")
+	//MapModel.getMapById(0,"local");
 	message: 0, //hold element where messages will be added
 	init: function(){
 		Message.message = document.getElementById('message');
 	},
+	getMapById: function(mapid, source) {
+		var mapdata;
+		if (source=="local") { //use local HTML5 Storage
+			mapdata = localStorage.getItem("SMORGmap" + mapid);
+		}
+		return mapdata;
+	},
+	loadMapById: function(mapid, source) {
+		var mapdata = MapModel.getMapById(mapid, "local");
+		Game.createTiles(mapdata);
+	},
+	putMapIdDataName: function(mapid, mapdata, mapname, source) {
+		if (source=="local") { //use local HTML5 Storage
+		//TODO: Check for overflow
+			localStorage.setItem("SMORGmap" + mapid, mapdata); //saves to the database, “key”, “value”
+			localStorage.setItem("SMORGmapName" + mapid, mapname); //saves to the database, “key”, “value”
+		}	
+	},
+	saveCurrentMap: function(source) {
+		var MapsList = MapModel.listMaps("local");
+		var countMaps = MapsList.length;
+		MapModel.putMapIdDataName(countMaps, MapModel.mapAsJSON(), "Map "+countMaps,"local");
+		Painter.listSelectableMaps("listofmaps");
+	},
+	listMaps: function(source, filter) {
+		var listOfMapNames = [];
+		if (source=="local") { //use local HTML5 Storage
+		//TODO: Temporary solution - assumes two variables saved for every map
+			for (var i=0;i<10;i++) {
+				var mapname = "SMORGmapName" + i;
+				var mapdataname = localStorage.getItem(mapname);
+				if (mapdataname) {
+					listOfMapNames.push(mapdataname);
+				}
+			}
+		}
+		return listOfMapNames;	
+	},
+	deleteMap: function(mapid, source) {
+		localStorage.removeItem("SMORGmap" + mapid); 
+		localStorage.removeItem("SMORGmapName" + mapid);
+	Painter.listSelectableMaps("listofmaps");
+	},
 	initJSON: function(msg){ //add new message
 //TODO
 	},
-	updateJSON: function(msg){ //add new message
-//TODO
+	mapAsJSON: function(){ //add new message
+		var strL, layer, strJSON =
+			'{"tilesWide": ' + Game.tileEngine[0].tilesWide + ', ' +
+			'"tilesHigh": ' + Game.tileEngine[0].tilesHigh + ', ' +
+			'"layers": [';
+		for (var i=0;i<Game.numLayers;i++) {
+			layer = Game.tileEngine[i];
+			strL = '{"layerName": "'+ layer.layerName + '", ' +
+				'"sourceFiles": "'+ layer.sourceFiles + '", ' +
+				'"sourceTileCounts": '+ layer.sourceTileCounts + ', ' +
+				'"sourceTileAcross": '+ layer.sourceTileAcross + ', ' +
+				'"tileOffsetX": '+ layer.tileOffsetX + ', ' +
+				'"tileOffsetY": '+ layer.tileOffsetY + ', ' +
+				'"tileWidth": '+ layer.tileWidth + ', ' +
+				'"tileHeight": '+ layer.tileHeight + ', ' +
+				'"zoneTilesWide": '+ layer.zoneTilesWide + ', ' +
+				'"zoneTilesHigh": '+ layer.zoneTilesHigh + ', ' +
+				'"showZoneColors": '+ layer.showZoneColors + ', ' +
+				'"tilesArray": [';
+			for (var t=0;t<layer.tilesArray.length-1;t++)
+				strL += vJS(layer.tilesArray[t]) + ', ';
+			strL += vJS(layer.tilesArray[layer.tilesArray.length -1]) + ']},';
+			strJSON += strL;
+		}
+		strJSON = strJSON.substring(0, strJSON.length-1);
+		strJSON += ']}';
+		return strJSON;
 	},
 	updateMapTiles: function(msg){ //add new message
 //TODO
@@ -27,13 +98,16 @@ var MapModel = { //object to parse JSON and update map model
 				engine = paint.painter_layer_num.options[ selecteditem ].value[0] ; 
 			}	    
 		}
-	    if (engine === undefined) {
-		  engine = Painter.currentLayer;
-	    }		
 		if(Game.tileEngine[engine]){
 			var tilenum = this.zoneAndTileNumBasedOnMapXY(x,y,engine);
-			Game.tileEngine[engine].zones[tilenum.zone].tiles[tilenum.tile].sourceIndex = num;
-		}
+			var TileEngine = Game.tileEngine[engine];
+			TileEngine.zones[tilenum.zone].tiles[tilenum.tile].sourceIndex = num;
+			
+			//Draw just this layer+zone for speed reasons, it will be redrawn soon
+			TileEngine.zones[tilenum.zone].drawTiles(0,0,TileEngine.width, TileEngine.height);
+			TileEngine.ctx.drawImage(TileEngine.zones[tilenum.zone].canvas, TileEngine.zones[tilenum.zone].left, TileEngine.zones[tilenum.zone].top);
+			TileEngine.tilesArray[tilenum.tileid] = num;
+		}		
 	},
 	addSprite: function(msg){ //add new message
 //TODO
@@ -59,7 +133,7 @@ var MapModel = { //object to parse JSON and update map model
 		return {"x":pos_x, "y":pos_y};
 	},
 	zoneAndTileNumBasedOnMapXY: function(x,y,engine){
-		var tile_x, tile_y, zone_x, zone_y, zone=0, tile=0, zonesinwidth, tilewidthofzone,tile_eng;
+		var tile_x, tile_y, zone_x, zone_y, zone_tot, zone=0, tile=0, zonesinwidth, tilewidthofzone,tile_eng;
 	    if (engine === undefined) {
 		  engine = Painter.currentLayer;
 	    }		
@@ -68,6 +142,7 @@ var MapModel = { //object to parse JSON and update map model
 		if(tile_eng && tile_eng.zones[zone]){	
 			zone_x = Math.ceil((x+1) / tile_eng.zoneTilesWide);
 			zone_y = Math.ceil((y+1) / tile_eng.zoneTilesHigh);
+			zone_tot = (y * tile_eng.tilesWide) + x;
 			zonesinwidth = Math.ceil(tile_eng.tilesWide / tile_eng.zoneTilesWide);
 			zone = ((zone_y-1) * zonesinwidth) + zone_x -1;
 			
@@ -79,7 +154,7 @@ var MapModel = { //object to parse JSON and update map model
 				tile = (tile_y * tilewidthofzone) + tile_x;
 			}
 		}
-		return {"zone":zone, "tile":tile};
+		return {"zone":zone, "tile":tile, "tileid":zone_tot};
 	},
 	tileArrayNumBasedOnMapXY: function(x,y,engine){
 		var val=0;
@@ -105,5 +180,9 @@ var MapModel = { //object to parse JSON and update map model
 
 };
 
+function vJS (val) { //returns string version of a JSON value
+	if (val) return val
+	else return -1;
+}
 
 MapModel.init();

@@ -7,10 +7,21 @@ function newSourceImage(){ //image used to create tile
 		image: 0, //dom image object
 		is_ready: 0, //is image loaded and ready to be drawn
 		init: function(file){
-			SourceImage.imageFilename = file;
-			SourceImage.is_ready = false;
-			SourceImage.image = new Image();  //create new image object
-			SourceImage.image.src = file; //load file into image object
+			try{
+				SourceImage.imageFilename = file;
+				SourceImage.is_ready = false;
+				SourceImage.image = new Image();  //create new image object
+				//SourceImage.image.src = file; //load file into image object
+				console.log("About to load sourceimage "+ file);
+				Cash.loadToImg(file, SourceImage.image, false); //Added Cash saving
+
+			} catch (exception) {
+				if (exception == QUOTA_EXCEEDED_ERR) {
+					console.log("Over cache quota!");
+				} else {
+					console.log("Other exception!");
+				}			
+			}
 		}
 	};
 	return SourceImage;
@@ -22,12 +33,16 @@ function newTileSource(){ //image used to create tile
 		ctx: 0, //main canvas drawing context
 		sourceImage: 0, //image source for this tile
 		init: function(width, height, src_x, src_y, source){
-			TileSource.sourceImage = source;  //set image source
-			TileSource.canvas = document.createElement('canvas');
-			TileSource.ctx = TileSource.canvas.getContext('2d'); //create main drawing canvas
-			TileSource.canvas.setAttribute('width', width); //set tile source canvas size
-			TileSource.canvas.setAttribute('height', height);
-			TileSource.ctx.drawImage(TileSource.sourceImage.image, src_x, src_y, width, height, 0, 0, width, height); //draw image to tile source canvas
+			try {
+				TileSource.sourceImage = source;  //set image source
+				TileSource.canvas = document.createElement('canvas');
+				TileSource.ctx = TileSource.canvas.getContext('2d'); //create main drawing canvas
+				TileSource.canvas.setAttribute('width', width); //set tile source canvas size
+				TileSource.canvas.setAttribute('height', height);
+				TileSource.ctx.drawImage(TileSource.sourceImage.image, src_x, src_y, width, height, 0, 0, width, height); //draw image to tile source canvas
+			} catch (exception) {
+				console.log("Other exception!");
+			}
 		}
 	};
 	return TileSource;
@@ -42,11 +57,15 @@ function newTile(){
 		height: 0,
 		sourceIndex: 0, //index of tile source in tile engine's source array
 		init: function(x, y, width, height, source){ //initialize sprite
-			Tile.x = x;
-			Tile.y = y;
-			Tile.width = width;
-			Tile.height = height;
-			Tile.sourceIndex = source; // set index of tile source for this tile
+			try {
+				Tile.x = x;
+				Tile.y = y;
+				Tile.width = width;
+				Tile.height = height;
+				Tile.sourceIndex = source; // set index of tile source for this tile
+			} catch (exception) {
+				Message.addMessage("Other exception!");
+			}
 		}
 	};
 	return Tile;  //returns newly created sprite object
@@ -132,7 +151,7 @@ function newZone(){
 					}
 				}
 			}
-//Added check for optional colors
+			//Added check for optional colors
 			if(Game.tileEngine.showZoneColors) {
 				Zone.ctx.fillStyle = Zone.color;    
 				Zone.ctx.fillRect(0,0,Zone.width, Zone.height);
@@ -178,6 +197,9 @@ function newTileEngine(){
 				TileEngine.sources[0].is_ready = true; // image source is ready when image is loaded
 				TileEngine.tileSource = new Array();
 				TileEngine.createTileSource(TileEngine.sourceTileCounts, TileEngine.sourceTileAcross);	//create tile sources using image source		
+				Game.hasChanged = true; //added to force a redraw
+//				Cash.saveImage(TileEngine.sources[0].image.src, TileEngine.sources[0].image);  //TODO: If not exist
+
 			}
 			TileEngine.tiles = new Array();
 			TileEngine.zones = new Array();
@@ -196,7 +218,7 @@ function newTileEngine(){
 			TileEngine.sourceFiles = obj.sourceFiles;
 			TileEngine.sourceTileCounts = obj.sourceTileCounts;
 			TileEngine.sourceTileAcross = obj.sourceTileAcross;
-			TileEngine.tileOffsetX = obj.tileOffestX;
+			TileEngine.tileOffsetX = obj.tileOffsetX;
 			TileEngine.tileOffsetY = obj.tileOffsetY;
 			TileEngine.tilesArray = obj.tilesArray;
 			TileEngine.showZoneColors = obj.showZoneColors;

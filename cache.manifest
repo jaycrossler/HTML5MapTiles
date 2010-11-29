@@ -1,13 +1,20 @@
-CACHE MANIFEST
+#CACHE MANIFEST
  
-# Offline cache 2010-10-22-v1
+# Offline cache 2010-10-31-v4
 
 CACHE:
-canvas.html
+index.html
 message.js
 tilemap.js
 painter.js
 game.js
 mapmodel.js
 
-images/*
+images/mi20041007b_medusachamber.png
+images/rsyo0k.png
+images/511n9k.png
+images/TileE-5.png
+images/tiles.png
+images/batalhao_tileset_cc_by_sa.png
+images/map57.jpg
+images/tiles2.png
